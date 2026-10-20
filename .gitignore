@@ -1,0 +1,11 @@
+node_modules/
+dist/
+output/
+research/
+tests/generated/
+tests/output/
+docs/
+.env
+.env.*
+/.github/workflows/
+/.pages-stage/
