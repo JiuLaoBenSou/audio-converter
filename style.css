@@ -32,5 +32,6 @@ body.support-open{overflow:hidden}
 .support-face-wechat img{width:185%;transform:translate(-50%,-43%)}
 .support-dismiss{display:block;width:100%;margin-top:18px;padding:12px 20px;border-color:#078a68;border-radius:11px;background:#078a68;color:#fff;font-size:16px;letter-spacing:2px}
 .support-dismiss:hover:enabled{background:#006f53}
+.support-close-hint{margin:8px 0 0;color:#718078;font-size:12px;line-height:1.5;text-align:center}
 @media(max-width:700px){.support-content{padding:20px 20px 18px}.support-dialog{border-radius:19px}.support-dialog h2{font-size:23px}#support-description{font-size:14px}.support-method-bar{margin-top:13px}.support-dismiss{margin-top:14px}}
 @media(max-height:680px){.support-content{padding:16px 18px}.support-eyebrow{margin-bottom:4px}.support-dialog h2{font-size:21px}#support-description{margin-top:5px}.support-method-bar{margin-top:10px;margin-bottom:8px}.support-perspective{width:min(100%,40dvh)}.support-dismiss{margin-top:12px;padding:10px 20px}}
