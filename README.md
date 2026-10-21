@@ -1,6 +1,6 @@
 # 音频转换工具 · NCM/QMC转Mp3
 
-[在线使用](https://jiulaobensou.github.io/audio-converter/)
+[在线使用](https://zhuanmp3.com/)
 
 选择音乐文件，在浏览器本地转换、试听并下载，支持批量和 ZIP。音频不上传；没有后端音频处理、广告或统计脚本。
 
