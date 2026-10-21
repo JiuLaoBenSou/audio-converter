@@ -9,3 +9,28 @@ h1 span{display:inline-block}
 
 /* Codex, 2026-10-20: optional format details; manual key UI removed 2026-10-21. */
 .format-details{border:1px solid #e0e7e2;border-radius:12px;margin:12px 0;background:#fff;color:#52635a;font-size:14px}.format-details summary{cursor:pointer;padding:14px 18px}.format-content{padding:0 18px 12px;line-height:1.8}.format-content p{margin:8px 0}
+
+/* Codex, 2026-10-22. Optional support dialog; the original QR images stay unchanged. */
+body.support-open{overflow:hidden}
+.support-dialog{padding:0;border:1px solid #dce9e2;border-radius:23px;width:min(420px,calc(100% - 32px));max-width:none;max-height:calc(100dvh - 32px);color:#073d32;background:#fff;box-shadow:0 28px 100px #001f2255;overflow:auto}
+.support-dialog::backdrop{background:rgba(6,26,25,.66);backdrop-filter:blur(4px)}
+.support-content{padding:25px 28px 23px;text-align:center}
+.support-eyebrow{margin:0 0 8px;font-size:12px;letter-spacing:2px;color:#608477}
+.support-dialog h2{margin:0;font-size:26px;line-height:1.5;letter-spacing:.5px;font-weight:700}
+#support-description{margin:8px 0 5px;font-size:15px;line-height:1.7;color:#426257}
+#support-note{margin:0;font-size:12px;line-height:1.8;color:#7c8d86}
+.support-method-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 12px;padding:0 2px;font-size:13px;color:#607b6e}
+#support-switch{padding:7px 12px;font-size:12px;font-weight:600;color:#08785d;border:1px solid #cbe8dc;border-radius:999px;background:#f1faf6}
+.support-perspective{perspective:1200px;width:min(100%,46dvh,360px);aspect-ratio:1;margin:auto}
+.support-flip{position:relative;width:100%;height:100%;aspect-ratio:1;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,.68,.16,1)}
+.support-flip[data-method="wechat"]{transform:rotateY(180deg)}
+.support-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border:1px solid #e5eee9;border-radius:14px;background:#fff}
+.support-face-wechat{transform:rotateY(180deg)}
+.support-face img{display:block;position:absolute;left:50%;top:50%;max-width:none;height:auto;user-select:none}
+/* Focus the display on the QR and recipient; the image files and code pixels are untouched. */
+.support-face-alipay img{width:120%;transform:translate(-50%,-61%)}
+.support-face-wechat img{width:185%;transform:translate(-50%,-43%)}
+.support-dismiss{display:block;width:100%;margin-top:18px;padding:12px 20px;border-color:#078a68;border-radius:11px;background:#078a68;color:#fff;font-size:16px;letter-spacing:2px}
+.support-dismiss:hover:enabled{background:#006f53}
+@media(max-width:700px){.support-content{padding:20px 20px 18px}.support-dialog{border-radius:19px}.support-dialog h2{font-size:23px}#support-description{font-size:14px}.support-method-bar{margin-top:13px}.support-dismiss{margin-top:14px}}
+@media(max-height:680px){.support-content{padding:16px 18px}.support-eyebrow{margin-bottom:4px}.support-dialog h2{font-size:21px}#support-description{margin-top:5px}.support-method-bar{margin-top:10px;margin-bottom:8px}.support-perspective{width:min(100%,40dvh)}.support-dismiss{margin-top:12px;padding:10px 20px}}

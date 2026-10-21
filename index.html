@@ -34,5 +34,21 @@
     <footer>技术预览 · 特殊格式不同版本的兼容性仍待补充 <a href="./THIRD_PARTY_NOTICES.md">开源归属</a></footer>
     <noscript>此工具需要启用 JavaScript，音频在你的浏览器内处理。</noscript>
   </main>
+  <dialog id="support-dialog" class="support-dialog" aria-labelledby="support-title" aria-describedby="support-description support-note">
+    <div class="support-content">
+      <p class="support-eyebrow">一盏茶，一份鼓励</p>
+      <h2 id="support-title">陛下，可还顺手？</h2>
+      <p id="support-description">若用着顺手，赏老奴一杯茶可好？</p>
+      <p id="support-note">自愿打赏，不影响下载。</p>
+      <div class="support-method-bar"><span id="support-method" aria-live="polite">支付宝收款码</span><button id="support-switch" type="button" aria-label="切换至微信收款码">朕用微信</button></div>
+      <div class="support-perspective">
+        <div id="support-flip" class="support-flip" data-method="alipay">
+          <div id="support-alipay" class="support-face support-face-alipay" aria-hidden="false"><img src="./assets/support/alipay.jpg" alt="作者的支付宝收款码" decoding="async"></div>
+          <div id="support-wechat" class="support-face support-face-wechat" aria-hidden="true"><img src="./assets/support/wechat.jpg" alt="作者的微信收款码" decoding="async"></div>
+        </div>
+      </div>
+      <button id="support-close" class="support-dismiss" type="button" autofocus>朕已阅</button>
+    </div>
+  </dialog>
 </body>
 </html>

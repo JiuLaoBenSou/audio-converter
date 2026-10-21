@@ -9,4 +9,6 @@ await copyFile('node_modules/@breezystack/lamejs/dist/lamejs.js','dist/vendor/la
 for(const name of ['index.html','style.css','THIRD_PARTY_NOTICES.md','CNAME'])await copyFile(name,`dist/${name}`);
 await mkdir('dist/licenses',{recursive:true});
 for(const name of await readdir('licenses'))await copyFile(`licenses/${name}`,`dist/licenses/${name}`);
+await mkdir('dist/assets/support',{recursive:true});
+for(const name of ['alipay.jpg','wechat.jpg'])await copyFile(`assets/support/${name}`,`dist/assets/support/${name}`);
 console.log('Built dist/: all scripts, styles and licenses served locally; no CDN dependencies.');

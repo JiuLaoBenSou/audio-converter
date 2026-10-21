@@ -3,7 +3,9 @@ import JSZip from 'jszip';
 import { validateInput, SUPPORTED } from './engine.mjs';
 import { uniqueName, admit } from './batch.mjs';
 import { decodeAudio } from './decode-audio.mjs';
+import { setupSupportDialog } from './support.mjs';
 const $=id=>document.getElementById(id);
+const showSupport = setupSupportDialog();
 $('files').accept=SUPPORTED.map(ext=>'.'+ext).join(',');
 let items=[],running=false,generation=0,activeWorker=null,zipBusy=false,zipUrl=null;
 const bytes=n=>n<1024**2?`${(n/1024).toFixed(1)} KB`:`${(n/1024**2).toFixed(1)} MB`;
@@ -81,13 +83,15 @@ $('clear').addEventListener('click',()=>{generation++;for(const i of items){i.ca
 $('zip').addEventListener('click',async()=>{
   const done=items.filter(i=>i.state==='done');
   if(done.reduce((n,i)=>n+i.blob.size,0)>150*1024**2){notice('打包总量超过 150 MB，请逐个下载，或清空后分批处理。');return;}
-  zipBusy=true;refresh();const zip=new JSZip();
+  zipBusy=true;refresh();const zip=new JSZip();let downloaded=false;
   try{
     for(const i of done)zip.file(i.outputName,await i.blob.arrayBuffer());
     const result=await zip.generateAsync({type:'blob',compression:'STORE'},({percent})=>$('zip').textContent=`打包 ${Math.round(percent)}%`);
     if(zipUrl)URL.revokeObjectURL(zipUrl);zipUrl=URL.createObjectURL(result);
     const a=el('a');a.href=zipUrl;a.download='本地音频.zip';document.body.append(a);a.click();a.remove();notice(`已生成 ${done.length} 个文件的 ZIP；下载由浏览器保存。`);
+    downloaded=true;
   }catch{notice('打包失败，可能内存不足。已转换的文件仍可逐个下载。');}
   finally{zipBusy=false;$('zip').textContent='↓ 打包下载';refresh();}
+  if(downloaded)showSupport();
 });
 if(location.protocol==='file:')notice('请通过本地 HTTP 服务打开此页面，直接双击 HTML 无法启动处理线程。');
