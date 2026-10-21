@@ -25,7 +25,7 @@ function renderItem(item){
   if(item.state==='processing'){const progress=el('progress','file-progress');progress.max=100;progress.value=item.progress||0;progress.setAttribute('aria-label',`${item.name} 处理进度`);main.append(progress);}
   if(item.warnings?.length)main.append(el('div','file-detail',item.warnings.join(' ')));
   const actions=el('div','file-buttons');
-  if(item.state==='done'){const a=el('a','', '下载');a.href=item.url;a.download=item.outputName;a.setAttribute('aria-label',`下载 ${item.outputName}`);actions.append(a);}
+  if(item.state==='done'){const a=el('a','', '下载');a.href=item.url;a.download=item.outputName;a.setAttribute('aria-label',`下载 ${item.outputName}`);a.addEventListener('click',()=>setTimeout(showSupport,0));actions.append(a);}
   if(item.state==='processing'||item.state==='queued'){const cancel=el('button','','取消');cancel.addEventListener('click',()=>{item.state='failed';item.message='已取消。';item.file=null;if(item.cancel)item.cancel();renderItem(item);refresh();});actions.append(cancel);}
   row.append(main,actions);
   if(item.state==='done'){const audio=el('audio','file-preview');audio.controls=true;audio.preload='none';audio.src=item.url;audio.setAttribute('aria-label',`试听 ${item.outputName}`);row.append(audio);}
@@ -88,7 +88,7 @@ $('zip').addEventListener('click',async()=>{
     for(const i of done)zip.file(i.outputName,await i.blob.arrayBuffer());
     const result=await zip.generateAsync({type:'blob',compression:'STORE'},({percent})=>$('zip').textContent=`打包 ${Math.round(percent)}%`);
     if(zipUrl)URL.revokeObjectURL(zipUrl);zipUrl=URL.createObjectURL(result);
-    const a=el('a');a.href=zipUrl;a.download='本地音频.zip';document.body.append(a);a.click();a.remove();notice(`已生成 ${done.length} 个文件的 ZIP；下载由浏览器保存。`);
+    const a=el('a');a.href=zipUrl;a.download='御用音乐包.zip';document.body.append(a);a.click();a.remove();notice(`已生成 ${done.length} 个文件的 ZIP；下载由浏览器保存。`);
     downloaded=true;
   }catch{notice('打包失败，可能内存不足。已转换的文件仍可逐个下载。');}
   finally{zipBusy=false;$('zip').textContent='↓ 打包下载';refresh();}

@@ -1,4 +1,4 @@
-// Codex, 2026-10-22. Optional support after a successful ZIP download; no payment API.
+// Codex, 2026-10-22. Optional support after single-file or ZIP download; no payment API.
 export function setupSupportDialog() {
   const dialog = document.getElementById('support-dialog');
   // Browsers without dialog support keep the download flow working.
