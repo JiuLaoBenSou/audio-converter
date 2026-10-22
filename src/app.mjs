@@ -1,4 +1,4 @@
-// Codex, 2026-10-20. Files never leave this browser; no remote dependencies.
+// Codex, 2026-10-22. Conversion code processes files locally; HTML separately loads AdSense.
 import JSZip from 'jszip';
 import { validateInput, SUPPORTED } from './engine.mjs';
 import { uniqueName, admit } from './batch.mjs';

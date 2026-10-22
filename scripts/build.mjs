@@ -1,4 +1,4 @@
-// Codex, 2026-10-20. Deterministic local bundle; no remote runtime assets.
+// Codex, 2026-10-22. Conversion dependencies are local; HTML also loads external AdSense.
 import { build } from 'esbuild';
 import { mkdir, copyFile, writeFile, readFile, readdir } from 'node:fs/promises';
 await mkdir('dist',{recursive:true});
@@ -11,4 +11,4 @@ await mkdir('dist/licenses',{recursive:true});
 for(const name of await readdir('licenses'))await copyFile(`licenses/${name}`,`dist/licenses/${name}`);
 await mkdir('dist/assets/support',{recursive:true});
 for(const name of ['alipay.jpg','wechat.jpg'])await copyFile(`assets/support/${name}`,`dist/assets/support/${name}`);
-console.log('Built dist/: all scripts, styles and licenses served locally; no CDN dependencies.');
+console.log('Built dist/: conversion scripts, styles and licenses are local; Google AdSense loads externally.');

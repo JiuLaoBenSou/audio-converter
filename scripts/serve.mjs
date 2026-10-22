@@ -10,7 +10,13 @@ const server=createServer(async(req,res)=>{
   try{
     const pathname=decodeURIComponent(new URL(req.url,'http://127.0.0.1').pathname);const file=resolve(root,'.'+(pathname==='/'?'/index.html':pathname));
     if(!file.startsWith(root+sep)){res.writeHead(403);res.end();return;}
-    const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)]||'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src blob:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"});res.end(req.method==='HEAD'?undefined:data);
+    const data=await readFile(file),headers={'Content-Type':mime[extname(file)]||'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};
+    // Use the HTML policy as the single source of truth; workers stay offline.
+    if(extname(file)==='.html'){
+      const policy=data.toString().match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)"/);
+      if(policy)headers['Content-Security-Policy']=policy[1];
+    }else headers['Content-Security-Policy']="default-src 'none'; script-src 'self'; connect-src 'none'; object-src 'none'";
+    res.writeHead(200,headers);res.end(req.method==='HEAD'?undefined:data);
   }catch{res.writeHead(404);res.end('Not found');}
 });
 const port=Number(process.env.AUDIO_PREVIEW_PORT||4317);

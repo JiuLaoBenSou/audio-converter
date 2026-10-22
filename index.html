@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src blob:; connect-src 'none'; font-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <!-- Keep default-deny CSP; only Google advertising origins receive network exceptions. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://www.googletagservices.com; worker-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://www.google.com; media-src blob:; connect-src https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://www.google.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; frame-src https://*.googlesyndication.com https://*.doubleclick.net https://www.google.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; font-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="description" content="普通音频转 MP3，恢复 NCM、QMC、KWM、KGM 等特殊音频，支持本地批量处理。">
   <title>NCM/QMC转Mp3</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./style.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153958256787466"
+     crossorigin="anonymous"></script>
   <script type="module" src="./app.js"></script>
 </head>
 <body>
