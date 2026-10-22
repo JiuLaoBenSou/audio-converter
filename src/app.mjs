@@ -4,31 +4,34 @@ import { validateInput, SUPPORTED } from './engine.mjs';
 import { uniqueName, admit } from './batch.mjs';
 import { decodeAudio } from './decode-audio.mjs';
 import { setupSupportDialog } from './support.mjs';
+import {setupLanguage,t,translateMessage,onLanguageChange} from './i18n.mjs';
 const $=id=>document.getElementById(id);
+setupLanguage();
 const showSupport = setupSupportDialog();
 $('files').accept=SUPPORTED.map(ext=>'.'+ext).join(',');
-let items=[],running=false,generation=0,activeWorker=null,zipBusy=false,zipUrl=null;
+let items=[],running=false,generation=0,activeWorker=null,zipBusy=false,zipUrl=null,zipProgress=0,lastNotice='';
 const bytes=n=>n<1024**2?`${(n/1024).toFixed(1)} KB`:`${(n/1024**2).toFixed(1)} MB`;
-function notice(message){$('notice').textContent=message;$('notice').hidden=!message;}
+function notice(message){lastNotice=message;$('notice').textContent=translateMessage(message);$('notice').hidden=!message;}
 function el(tag,className,text){const n=document.createElement(tag);if(className)n.className=className;if(text!==undefined)n.textContent=text;return n;}
 function refresh(){
-  $('empty').hidden=items.length>0;$('count').textContent=`${items.length} 个文件`;
+  $('empty').hidden=items.length>0;$('count').textContent=t('fileCount',{count:items.length});
   const done=items.filter(x=>x.state==='done').length,failed=items.filter(x=>x.state==='failed').length;
   $('zip').disabled=!done||running||zipBusy;$('clear').disabled=!items.length||zipBusy;
   $('select').disabled=zipBusy;
-  $('summary').hidden=!items.length;$('summary').textContent=`${done} 个成功 · ${failed} 个失败${running?' · 正在本地处理':' · 下载完成后可清空释放内存'}`;
+  $('zip').textContent=zipBusy?t('packing',{percent:zipProgress}):t('zip');
+  $('summary').hidden=!items.length;$('summary').textContent=t('summary',{done,failed})+t(running?'running':'releaseMemory');
 }
 function renderItem(item){
   const row=el('li');row.className=item.state;row.dataset.state=item.state;
   const main=el('div');main.append(el('div','file-name',item.name),el('div','file-detail',`${bytes(item.size)}${item.outputName?` → ${item.outputName} · ${bytes(item.blob.size)}`:''}`));
-  const state=el('div','file-state',item.message);main.append(state);
-  if(item.state==='processing'){const progress=el('progress','file-progress');progress.max=100;progress.value=item.progress||0;progress.setAttribute('aria-label',`${item.name} 处理进度`);main.append(progress);}
-  if(item.warnings?.length)main.append(el('div','file-detail',item.warnings.join(' ')));
+  const state=el('div','file-state',translateMessage(item.message));main.append(state);
+  if(item.state==='processing'){const progress=el('progress','file-progress');progress.max=100;progress.value=item.progress||0;progress.setAttribute('aria-label',t('progress',{name:item.name}));main.append(progress);}
+  if(item.warnings?.length)main.append(el('div','file-detail',item.warnings.map(translateMessage).join(' ')));
   const actions=el('div','file-buttons');
-  if(item.state==='done'){const a=el('a','', '下载');a.href=item.url;a.download=item.outputName;a.setAttribute('aria-label',`下载 ${item.outputName}`);a.addEventListener('click',()=>setTimeout(showSupport,0));actions.append(a);}
-  if(item.state==='processing'||item.state==='queued'){const cancel=el('button','','取消');cancel.addEventListener('click',()=>{item.state='failed';item.message='已取消。';item.file=null;if(item.cancel)item.cancel();renderItem(item);refresh();});actions.append(cancel);}
+  if(item.state==='done'){const a=el('a','',t('download'));a.href=item.url;a.download=item.outputName;a.setAttribute('aria-label',t('downloadLabel',{name:item.outputName}));a.addEventListener('click',()=>setTimeout(showSupport,0));actions.append(a);}
+  if(item.state==='processing'||item.state==='queued'){const cancel=el('button','',t('cancel'));cancel.addEventListener('click',()=>{item.state='failed';item.message='已取消。';item.file=null;if(item.cancel)item.cancel();renderItem(item);refresh();});actions.append(cancel);}
   row.append(main,actions);
-  if(item.state==='done'){const audio=el('audio','file-preview');audio.controls=true;audio.preload='none';audio.src=item.url;audio.setAttribute('aria-label',`试听 ${item.outputName}`);row.append(audio);}
+  if(item.state==='done'){const audio=el('audio','file-preview');audio.controls=true;audio.preload='none';audio.src=item.url;audio.setAttribute('aria-label',t('preview',{name:item.outputName}));row.append(audio);}
   if(item.row)item.row.replaceWith(row);else $('list').append(row);item.row=row;
 }
 function convertInWorker(item){
@@ -39,7 +42,7 @@ function convertInWorker(item){
     try{worker=new Worker('./worker.js',{type:'module'});activeWorker=worker;}catch{finish();reject(Error('当前浏览器无法启动本地处理线程。请通过 localhost 或 HTTPS 在现代浏览器打开。'));return;}
     timer=setTimeout(()=>{finish();reject(Error('处理超过 180 秒，已停止。请分批或使用桌面工具。'));},180000);
     worker.onerror=()=>{finish();reject(Error('处理线程异常退出，可能内存不足或浏览器不兼容。'));};
-    worker.onmessage=async({data})=>{if(finished)return;if(data.type==='progress'){item.progress=data.value;item.message=`${data.label} · ${data.value}%`;const p=item.row.querySelector('progress');if(p)p.value=data.value;item.row.querySelector('.file-state').textContent=item.message;}else if(data.type==='decode'){item.message='正在解码，准备转为 MP3';renderItem(item);try{const pcm=await decodeAudio(data.audio,data.mime,()=>!finished);if(!finished)worker.postMessage({type:'encode',...pcm},pcm.channels.map(c=>c.buffer));}catch(e){if(!finished){finish();reject(e);}}}else if(data.type==='done'){finish();resolve(data);}else if(data.type==='error'){finish();reject(Error(data.message));}};
+    worker.onmessage=async({data})=>{if(finished)return;if(data.type==='progress'){item.progress=data.value;item.message=`${data.label} · ${data.value}%`;const p=item.row.querySelector('progress');if(p)p.value=data.value;item.row.querySelector('.file-state').textContent=translateMessage(item.message);}else if(data.type==='decode'){item.message='正在解码，准备转为 MP3';renderItem(item);try{const pcm=await decodeAudio(data.audio,data.mime,()=>!finished);if(!finished)worker.postMessage({type:'encode',...pcm},pcm.channels.map(c=>c.buffer));}catch(e){if(!finished){finish();reject(e);}}}else if(data.type==='done'){finish();resolve(data);}else if(data.type==='error'){finish();reject(Error(data.message));}};
     worker.postMessage({file:item.file});
   });
 }
@@ -83,15 +86,17 @@ $('clear').addEventListener('click',()=>{generation++;for(const i of items){i.ca
 $('zip').addEventListener('click',async()=>{
   const done=items.filter(i=>i.state==='done');
   if(done.reduce((n,i)=>n+i.blob.size,0)>150*1024**2){notice('打包总量超过 150 MB，请逐个下载，或清空后分批处理。');return;}
-  zipBusy=true;refresh();const zip=new JSZip();let downloaded=false;
+  zipBusy=true;zipProgress=0;refresh();const zip=new JSZip();let downloaded=false;
   try{
     for(const i of done)zip.file(i.outputName,await i.blob.arrayBuffer());
-    const result=await zip.generateAsync({type:'blob',compression:'STORE'},({percent})=>$('zip').textContent=`打包 ${Math.round(percent)}%`);
+    const result=await zip.generateAsync({type:'blob',compression:'STORE'},({percent})=>{zipProgress=Math.round(percent);$('zip').textContent=t('packing',{percent:zipProgress});});
     if(zipUrl)URL.revokeObjectURL(zipUrl);zipUrl=URL.createObjectURL(result);
-    const a=el('a');a.href=zipUrl;a.download='御用音乐包.zip';document.body.append(a);a.click();a.remove();notice(`已生成 ${done.length} 个文件的 ZIP；下载由浏览器保存。`);
+    const a=el('a');a.href=zipUrl;a.download=t('zipName');document.body.append(a);a.click();a.remove();notice(`已生成 ${done.length} 个文件的 ZIP；下载由浏览器保存。`);
     downloaded=true;
   }catch{notice('打包失败，可能内存不足。已转换的文件仍可逐个下载。');}
-  finally{zipBusy=false;$('zip').textContent='↓ 打包下载';refresh();}
+  finally{zipBusy=false;refresh();}
   if(downloaded)showSupport();
 });
+onLanguageChange(()=>{for(const item of items)renderItem(item);refresh();notice(lastNotice);});
+refresh();
 if(location.protocol==='file:')notice('请通过本地 HTTP 服务打开此页面，直接双击 HTML 无法启动处理线程。');

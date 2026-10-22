@@ -1,4 +1,5 @@
 // Codex, 2026-10-22. Optional support after single-file or ZIP download; no payment API.
+import {t,onLanguageChange} from './i18n.mjs';
 export function setupSupportDialog() {
   const dialog = document.getElementById('support-dialog');
   // Browsers without dialog support keep the download flow working.
@@ -13,11 +14,13 @@ export function setupSupportDialog() {
     flip.dataset.method = method;
     alipay.setAttribute('aria-hidden', String(useWechat));
     wechat.setAttribute('aria-hidden', String(!useWechat));
-    label.textContent = useWechat ? '微信收款码' : '支付宝收款码';
-    toggle.textContent = useWechat ? '朕用支付宝' : '朕用微信';
-    toggle.setAttribute('aria-label', useWechat ? '切换至支付宝收款码' : '切换至微信收款码');
+    label.textContent = t(useWechat ? 'wechat' : 'alipay');
+    toggle.textContent = t(useWechat ? 'useAlipay' : 'useWechat');
+    toggle.setAttribute('aria-label', t(useWechat ? 'switchAlipay' : 'switchWechat'));
   }
   toggle.addEventListener('click', () => setMethod(flip.dataset.method === 'wechat' ? 'alipay' : 'wechat'));
+  setMethod('alipay');
+  onLanguageChange(()=>setMethod(flip.dataset.method));
   document.getElementById('support-close').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => document.body.classList.remove('support-open'));
   return () => {
