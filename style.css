@@ -29,7 +29,7 @@ body.support-open{overflow:hidden}
 .support-face img{display:block;position:absolute;left:50%;top:50%;max-width:none;height:auto;user-select:none}
 /* Focus the display on the QR and recipient; the image files and code pixels are untouched. */
 .support-face-alipay img{width:120%;transform:translate(-50%,-61%)}
-.support-face-wechat img{width:185%;transform:translate(-50%,-43%)}
+.support-face-wechat img{width:225%;transform:translate(-50%,-38.3%)}
 .support-dismiss{display:block;width:100%;margin-top:18px;padding:12px 20px;border-color:#078a68;border-radius:11px;background:#078a68;color:#fff;font-size:16px;letter-spacing:2px}
 .support-dismiss:hover:enabled{background:#006f53}
 .support-close-hint{margin:8px 0 0;color:#718078;font-size:12px;line-height:1.5;text-align:center}
