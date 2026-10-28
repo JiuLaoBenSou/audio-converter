@@ -1,7 +1,17 @@
 // Codex, 2026-10-22. Local language preference only; no remote translation service.
+import {updateSeo} from './seo.mjs';
 let language='zh';
 const listeners=new Set();
 const copy={
+  stepsTitle:['如何转换音频','How to convert audio'],
+  steps:['选择或拖入文件，等待队列处理完成，再单独下载或打包下载。无需注册，原文件不会被修改。','Choose or drop your files, wait for processing to finish, then download individual results or a ZIP. No sign-up is required and original files are not modified.'],
+  faqTitle:['常见问题','Common questions'],
+  faqOggTitle:['OGG、FLAC、WAV 可以转 MP3 吗？','Can I convert OGG, FLAC and WAV to MP3?'],
+  faqOgg:['浏览器能够解码的普通音频会转为 192 kbps MP3，每个文件最长 20 分钟、最大 100 MB；已有 MP3 原样保留。转为 MP3 属于有损编码，不会提升原音质。','Everyday audio that your browser can decode is converted to 192 kbps MP3, up to 20 minutes and 100 MB per file. Existing MP3 files are kept as-is. MP3 encoding is lossy and does not improve source quality.'],
+  faqNcmTitle:['NCM、QMC 处理后一定是 MP3 吗？','Will NCM and QMC always become MP3?'],
+  faqNcm:['不一定。特殊格式恢复原音频，结果可能是 MP3、FLAC 或 OGG。需要额外密钥的版本暂不支持。','No. Special-format recovery preserves the original audio, which may be MP3, FLAC or OGG. Versions requiring an additional key are not supported.'],
+  faqFailureTitle:['为什么有的文件处理失败？','Why do some files fail?'],
+  faqFailure:['可能是文件版本不受支持、内容损坏，或当前浏览器无法解码。可换用新版浏览器重试；仅修改文件后缀不能完成格式转换。','A file may use an unsupported version, be damaged, or require decoding your browser does not support. Try a current browser. Renaming a file extension does not convert its contents.'],
   title:['NCM/QMC转Mp3','NCM/QMC to MP3'],
   brand:['音频转换工具','Audio Converter'],
   home:['音频转换工具首页','Audio Converter home'],
@@ -65,6 +75,7 @@ export function t(key,values={}){
   const value=copy[key]?.[language==='en'?1:0]??key;
   return value.replace(/\{(\w+)\}/g,(_,name)=>String(values[name]??''));
 }
+export function staticText(key,lang){return copy[key]?.[lang==='en'?1:0]??key;}
 
 const messages=new Map([
   ['不支持此扩展名。请查看页面中的格式列表。','Unsupported file extension. See the supported formats below.'],
@@ -137,8 +148,7 @@ export function translateMessage(message){
 export function onLanguageChange(listener){listeners.add(listener);return()=>listeners.delete(listener);}
 function applyLanguage(){
   document.documentElement.lang=language==='en'?'en':'zh-CN';
-  document.title=t('title');
-  document.querySelector('meta[name="description"]')?.setAttribute('content',t('description'));
+  updateSeo(language);
   document.querySelectorAll('[data-i18n]').forEach(node=>{node.textContent=t(node.dataset.i18n);});
   document.querySelectorAll('[data-i18n-aria]').forEach(node=>node.setAttribute('aria-label',t(node.dataset.i18nAria)));
   document.querySelectorAll('[data-i18n-alt]').forEach(node=>node.setAttribute('alt',t(node.dataset.i18nAlt)));
@@ -148,13 +158,15 @@ export function setupLanguage(){
   const selector=document.getElementById('language');
   let saved;try{saved=localStorage.getItem('audio-converter-language');}catch{}
   const query=new URL(location.href).searchParams.get('lang');
-  language=['en','zh'].includes(query)?query:saved==='en'?'en':'zh';
+  language=['en','zh'].includes(query)?query:location.pathname.endsWith('/en.html')?'en':saved==='en'?'en':'zh';
+  function syncUrl(){try{const url=new URL(location.href);url.pathname=new URL(language==='en'?'en.html':'./',url).pathname;url.searchParams.delete('lang');history.replaceState(null,'',url);}catch{}}
+  syncUrl();
   try{localStorage.setItem('audio-converter-language',language);}catch{}
   applyLanguage();
   selector?.addEventListener('change',()=>{
     language=selector.value==='en'?'en':'zh';
     try{localStorage.setItem('audio-converter-language',language);}catch{}
-    try{const url=new URL(location.href);url.searchParams.set('lang',language);history.replaceState(null,'',url);}catch{}
+    syncUrl();
     applyLanguage();for(const listener of listeners)listener();
   });
 }

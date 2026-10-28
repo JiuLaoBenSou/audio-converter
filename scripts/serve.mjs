@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 const root=resolve('dist');const log=[];await mkdir('docs/verification',{recursive:true});
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.md':'text/plain; charset=utf-8','.txt':'text/plain; charset=utf-8'};
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.md':'text/plain; charset=utf-8','.txt':'text/plain; charset=utf-8','.xml':'application/xml; charset=utf-8'};
 const server=createServer(async(req,res)=>{
   log.push({method:req.method,url:req.url});await writeFile('docs/verification/server-requests.json',JSON.stringify(log,null,2));
   if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);res.end('Read only');return;}
