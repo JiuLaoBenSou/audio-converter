@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Keep default-deny CSP; only Google advertising origins receive network exceptions. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://www.googletagservices.com; worker-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://www.google.com; media-src blob:; connect-src https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://www.google.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; frame-src https://*.googlesyndication.com https://*.doubleclick.net https://www.google.com https://ep1.adtrafficquality.google https://ep2.adtrafficquality.google; font-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Convert OGG, FLAC, WAV and M4A to MP3 in your browser, or recover supported NCM/QMC files in batches. No sign-up or audio upload. Special formats keep their original encoding; version support varies.">
+  <title>OGG, FLAC &amp; WAV to MP3 | NCM/QMC Audio Recovery - ZhuanMP3</title>
+  <link rel="canonical" href="https://zhuanmp3.com/en.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://zhuanmp3.com/">
+  <link rel="alternate" hreflang="en" href="https://zhuanmp3.com/en.html">
+  <link rel="alternate" hreflang="x-default" href="https://zhuanmp3.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ZhuanMP3">
+  <meta property="og:title" content="OGG, FLAC &amp; WAV to MP3 | NCM/QMC Audio Recovery - ZhuanMP3">
+  <meta property="og:description" content="Convert OGG, FLAC, WAV and M4A to MP3 in your browser, or recover supported NCM/QMC files in batches. No sign-up or audio upload. Special formats keep their original encoding; version support varies.">
+  <meta property="og:url" content="https://zhuanmp3.com/en.html">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="OGG, FLAC &amp; WAV to MP3 | NCM/QMC Audio Recovery - ZhuanMP3">
+  <meta name="twitter:description" content="Convert OGG, FLAC, WAV and M4A to MP3 in your browser, or recover supported NCM/QMC files in batches. No sign-up or audio upload. Special formats keep their original encoding; version support varies.">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="./favicon.svg">
+  <link rel="stylesheet" href="./style.css?v=20261024-wechat">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153958256787466"
+     crossorigin="anonymous"></script>
+  <script type="module" src="./app.js?v=20261028-seo"></script>
+</head>
+<body>
+  <header><div class="header-inner"><a href="./" class="brand" aria-label="Audio Converter home" data-i18n-aria="home"><svg viewBox="0 0 30 32" aria-hidden="true"><path d="M3 14v5M9 8v17M15 2v29M21 8v17M27 14v5"/></svg><span data-i18n="brand">Audio Converter</span></a><select id="language" class="language-switch" aria-label="Language / 语言"><option value="zh" lang="zh-CN">中文</option><option value="en" selected lang="en">English</option></select></div></header>
+  <main>
+    <section class="intro"><h1 data-i18n="title">NCM/QMC to MP3</h1><p data-i18n="intro">Convert everyday audio to MP3. Recover supported special formats in their original audio format.</p></section>
+    <section id="drop" class="drop-zone" aria-label="Audio file drop area" data-i18n-aria="dropLabel">
+      <svg class="upload-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 31V7m-9 9 9-9 9 9M7 31v8a3 3 0 0 0 3 3h28a3 3 0 0 0 3-3v-8"/></svg>
+      <h2 data-i18n="dropTitle">Drop your audio files here, or choose files</h2>
+      <button id="select" class="primary" data-i18n="select">Choose files</button>
+      <input id="files" type="file" multiple hidden aria-label="Choose audio files" data-i18n-aria="selectLabel">
+      <p data-i18n="limits">OGG · NCM · QMC · KWM · KGM and more · Up to 100 MB per file</p>
+    </section>
+    <p id="notice" class="notice" role="status" hidden></p>
+    <section class="queue" aria-labelledby="queue-title">
+      <div class="queue-head"><div class="queue-label"><h2 id="queue-title" data-i18n="queue">Processing queue</h2><span id="count">0 files</span></div><div class="queue-actions"><button id="zip" disabled data-i18n="zip">↓ Download ZIP</button><button id="clear" disabled data-i18n="clear">Clear</button></div></div>
+      <div id="empty"><svg viewBox="0 0 40 48" aria-hidden="true"><path d="M6 2h19l11 11v29a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3Zm18 1v11h11"/></svg><p data-i18n="empty">No files yet. Choose some audio to get started.</p></div>
+      <ul id="list" aria-label="File processing results" data-i18n-aria="results"></ul>
+      <p id="summary" class="summary" role="status" hidden></p>
+    </section>
+    <details class="format-details"><summary data-i18n="formats">Supported formats &amp; details</summary><div class="format-content"><p><strong data-i18n="ordinaryTitle">Everyday audio → MP3: </strong><span data-i18n="ordinary">OGG / OPUS, FLAC, WAV, M4A / MP4, AAC and more. Existing MP3 files are kept as-is. Other audio is encoded at 192 kbps, up to 20 minutes per file. Decoding depends on your browser; WMA / APE / AIFF / DFF may not work.</span></p><p><strong data-i18n="restoredTitle">Recover original audio: </strong><span data-i18n="restored">NCM, QMC0 / 2 / 3 / 4 / 6 / 8 / FLAC / OGG, MFLAC / MFLAC0, MGG / MGG0 / MGG1 / MGGL, MMP4, TKM, BKC variants, KWM, KGM / KGMA / VPR, UC, X2M / X3M, MG3D, XM and TM variants.</span></p></div></details>
+    <section class="principles" aria-label="How your files are handled" data-i18n-aria="principles"><div><h3 data-i18n="privacyTitle">Privacy first</h3><p data-i18n="privacy">We do not collect or store your audio files.</p></div><div><h3 data-i18n="perFileTitle">The right format for each file</h3><p data-i18n="perFile">Everyday audio becomes MP3. Special formats keep their original audio encoding.</p></div><div><h3 data-i18n="originalsTitle">Your originals stay yours</h3><p data-i18n="originals">Download the results. Your original files remain unchanged.</p></div></section>
+    <details class="format-details"><summary data-i18n="stepsTitle">How to convert audio</summary><div class="format-content"><p data-i18n="steps">Choose or drop your files, wait for processing to finish, then download individual results or a ZIP. No sign-up is required and original files are not modified.</p></div></details>
+    <details class="format-details"><summary data-i18n="faqTitle">Common questions</summary><div class="format-content"><h3 data-i18n="faqOggTitle">Can I convert OGG, FLAC and WAV to MP3?</h3><p data-i18n="faqOgg">Everyday audio that your browser can decode is converted to 192 kbps MP3, up to 20 minutes and 100 MB per file. Existing MP3 files are kept as-is. MP3 encoding is lossy and does not improve source quality.</p><h3 data-i18n="faqNcmTitle">Will NCM and QMC always become MP3?</h3><p data-i18n="faqNcm">No. Special-format recovery preserves the original audio, which may be MP3, FLAC or OGG. Versions requiring an additional key are not supported.</p><h3 data-i18n="faqFailureTitle">Why do some files fail?</h3><p data-i18n="faqFailure">A file may use an unsupported version, be damaged, or require decoding your browser does not support. Try a current browser. Renaming a file extension does not convert its contents.</p></div></details>
+    <footer><span data-i18n="footer">Technical preview · Compatibility with special-format versions is still being expanded.</span> <a href="./THIRD_PARTY_NOTICES.md" data-i18n="licenses">Open-source credits</a> · <a href="./" lang="zh-CN" hreflang="zh-CN">中文</a> · <a href="./en.html" lang="en" hreflang="en">English</a></footer>
+    <noscript data-i18n="noscript">Enable JavaScript to use this tool. Audio is processed in your browser.</noscript>
+  </main>
+  <dialog id="support-dialog" class="support-dialog" aria-labelledby="support-title" aria-describedby="support-description support-note">
+    <div class="support-content">
+      <p class="support-eyebrow" data-i18n="supportEyebrow">A little support goes a long way</p>
+      <h2 id="support-title" data-i18n="supportTitle">Buy me a coffee</h2>
+      <p id="support-description" data-i18n="supportDescription">Found this helpful? Buy me a coffee and help keep this little tool going.</p>
+      <p id="support-note" data-i18n="supportNote">Your download is ready. Supporting is always optional.</p>
+      <div class="support-method-bar"><span id="support-method" aria-live="polite">Alipay</span><button id="support-switch" type="button" aria-label="Switch to WeChat Pay QR code">Use WeChat Pay</button></div>
+      <div class="support-perspective">
+        <div id="support-flip" class="support-flip" data-method="alipay">
+          <div id="support-alipay" class="support-face support-face-alipay" aria-hidden="false"><img src="./assets/support/alipay.jpg?v=20261024-alipay" alt="Creator's Alipay payment QR code" data-i18n-alt="alipayAlt" decoding="async"></div>
+          <div id="support-wechat" class="support-face support-face-wechat" aria-hidden="true"><img src="./assets/support/wechat.jpg?v=20261024" alt="Creator's WeChat Pay payment QR code" data-i18n-alt="wechatAlt" decoding="async"></div>
+        </div>
+      </div>
+      <button id="support-close" class="support-dismiss" type="button" autofocus data-i18n="close">Not now</button>
+      <p class="support-close-hint" data-i18n="closeHint">Click “Not now” to close this window.</p>
+    </div>
+  </dialog>
+</body>
+</html>
