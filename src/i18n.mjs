@@ -3,6 +3,13 @@ import {updateSeo} from './seo.mjs';
 let language='zh';
 const listeners=new Set();
 const copy={
+  contentNav:['说明与政策','Help and policies'],
+  contentLink0:['关于','About (中文)'],
+  contentLink1:['联系','Contact (中文)'],
+  contentLink2:['隐私政策','Privacy (中文)'],
+  contentLink3:['使用说明','How to use (中文)'],
+  contentLink4:['NCM / QMC 是什么','NCM / QMC (中文)'],
+  contentLink5:['MP3 与音质','MP3 quality (中文)'],
   stepsTitle:['如何转换音频','How to convert audio'],
   steps:['选择或拖入文件，等待队列处理完成，再单独下载或打包下载。无需注册，原文件不会被修改。','Choose or drop your files, wait for processing to finish, then download individual results or a ZIP. No sign-up is required and original files are not modified.'],
   faqTitle:['常见问题','Common questions'],
