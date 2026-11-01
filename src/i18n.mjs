@@ -1,13 +1,15 @@
 // Codex, 2026-10-22. Local language preference only; no remote translation service.
 import {updateSeo} from './seo.mjs';
+import {errorCategory} from './task-copy.mjs';
 let language='zh';
 const listeners=new Set();
 const copy={
+  detectedOutput:['实际输出：{ext}','Actual output: {ext}'],
   contentNav:['说明与政策','Help and policies'],
-  contentLink0:['关于','About (中文)'],
-  contentLink1:['联系','Contact (中文)'],
-  contentLink2:['隐私政策','Privacy (中文)'],
-  contentLink3:['使用说明','How to use (中文)'],
+  contentLink0:['关于','About'],
+  contentLink1:['联系','Contact'],
+  contentLink2:['隐私政策','Privacy'],
+  contentLink3:['使用说明','How to use'],
   contentLink4:['NCM / QMC 是什么','NCM / QMC (中文)'],
   contentLink5:['MP3 与音质','MP3 quality (中文)'],
   stepsTitle:['如何转换音频','How to convert audio'],
@@ -19,7 +21,7 @@ const copy={
   faqNcm:['不一定。特殊格式恢复原音频，结果可能是 MP3、FLAC 或 OGG。需要额外密钥的版本暂不支持。','No. Special-format recovery preserves the original audio, which may be MP3, FLAC or OGG. Versions requiring an additional key are not supported.'],
   faqFailureTitle:['为什么有的文件处理失败？','Why do some files fail?'],
   faqFailure:['可能是文件版本不受支持、内容损坏，或当前浏览器无法解码。可换用新版浏览器重试；仅修改文件后缀不能完成格式转换。','A file may use an unsupported version, be damaged, or require decoding your browser does not support. Try a current browser. Renaming a file extension does not convert its contents.'],
-  title:['NCM/QMC转Mp3','NCM/QMC to MP3'],
+  title:['音频转 MP3 · 原格式恢复','Audio to MP3 & original-format recovery'],
   brand:['音频转换工具','Audio Converter'],
   home:['音频转换工具首页','Audio Converter home'],
   description:['普通音频转 MP3，恢复 NCM、QMC、KWM、KGM 等特殊音频，支持本地批量处理。','Convert audio to MP3 and recover supported NCM, QMC, KWM and KGM files locally in your browser.'],
@@ -149,7 +151,7 @@ export function translateMessage(message){
   if(match)return `${translateMessage(match[1])} · ${match[2]}%`;
   match=message.match(/^已生成 (\d+) 个文件的 ZIP；下载由浏览器保存。$/);
   if(match)return `ZIP created with ${match[1]} ${match[1]==='1'?'file':'files'}. Your browser will save the download.`;
-  return /[\u3400-\u9fff]/.test(message)?'This file could not be processed. Its format or version may not be supported.':message;
+  return /[\u3400-\u9fff]/.test(message)?`${errorCategory(message,'en')}. See the supported formats and limits.`:message;
 }
 
 export function onLanguageChange(listener){listeners.add(listener);return()=>listeners.delete(listener);}
@@ -159,6 +161,7 @@ function applyLanguage(){
   document.querySelectorAll('[data-i18n]').forEach(node=>{node.textContent=t(node.dataset.i18n);});
   document.querySelectorAll('[data-i18n-aria]').forEach(node=>node.setAttribute('aria-label',t(node.dataset.i18nAria)));
   document.querySelectorAll('[data-i18n-alt]').forEach(node=>node.setAttribute('alt',t(node.dataset.i18nAlt)));
+  document.querySelectorAll('[data-content-slug]').forEach(node=>{const slug=node.dataset.contentSlug;node.setAttribute('href',language==='en'&&['about','contact','privacy','how-to-use'].includes(slug)?`./en/${slug}.html`:`./${slug}.html`);});
   const selector=document.getElementById('language');if(selector)selector.value=language;
 }
 export function setupLanguage(){

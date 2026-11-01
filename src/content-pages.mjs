@@ -1,4 +1,6 @@
-// Original Chinese help articles. Rendered as independent static pages by build.mjs.
+// Original help articles, rendered as independent static pages by build.mjs.
+import {englishPages} from './content-en.mjs';
+export {englishPages};
 export const contentPages = [
   {slug:'about', label:'关于', title:'关于转MP3：浏览器里的音频转换工具', description:'了解转MP3的用途、作者、免费使用方式，以及音频转换、格式恢复和自愿支持的边界。', body:`
 <p class="lead">让已有的音频文件，更方便地在熟悉的播放器里播放。</p>
@@ -30,7 +32,7 @@ export const contentPages = [
 <p class="lead">选择文件 → 等待处理 → 试听并下载。全程不需要注册。</p>
 <h2>第一步：选中本地音频</h2><figure><img src="./assets/help/select.svg" alt="操作示意：点击选择文件，或把音频拖入浅绿色选择区" width="720" height="240"><figcaption>点击“选择文件”，也可以从文件夹拖入多个音频。</figcaption></figure><p>打开<a href="./">转换工具</a>，点击“选择文件”，或把文件拖到绿色区域。每个文件不超过 100 MB；普通音频转码最长支持 20 分钟。不要仅通过改后缀来转换格式。</p>
 <h2>第二步：等待队列处理</h2><figure><img src="./assets/help/queue.svg" alt="操作示意：队列展示处理进度、已转换的 MP3 和已恢复的 FLAC" width="720" height="240"><figcaption>看队列中的文件状态和实际输出格式，失败原因也会显示在这里。</figcaption></figure><p>普通音频由浏览器解码并转为 192 kbps MP3，已有 MP3 原样保留。NCM/QMC 等受支持的特殊格式尝试恢复原音频，输出不一定是 MP3。请保持网页打开；文件多时分批处理，避免内存不足。</p>
-<h2>第三步：试听并保存</h2><figure><img src="./assets/help/download.svg" alt="操作示意：使用单个文件下载按钮，或点击打包下载获得 ZIP" width="720" height="240"><figcaption>单曲下载或打包下载均可，原文件不会被修改。</figcaption></figure><p>处理成功后可先试听，再点击该文件旁的“下载”。有多个结果时点击“打包下载”获得 ZIP；中文版名称为“御用音乐包”。打包大小超过 150 MB 时请逐个下载或分批处理。下载后若显示自愿支持弹窗，点击“朕已阅”即可关闭，不影响下载。</p>
+<h2>第三步：试听并保存</h2><figure><img src="./assets/help/download.svg" alt="操作示意：使用单个文件下载按钮，或点击打包下载获得 ZIP" width="720" height="240"><figcaption>单曲下载或打包下载均可，原文件不会被修改。</figcaption></figure><p>处理成功后可先试听，再点击该文件旁的“下载”。有多个结果时点击“打包下载”获得 ZIP；中文版名称为“御用音乐包”。打包大小超过 150 MB 时请逐个下载或分批处理。仅打包下载成功发起后显示自愿支持弹窗，点击“朕已阅”即可关闭，不影响下载。单曲下载和打包失败不弹窗。</p>
 <h2>三个常见使用场景</h2><h3>OGG 文件想在老播放器里播放</h3><p>选择 OGG，等待显示“已转换 · MP3”，下载后在目标播放器试听。能否解码取决于浏览器；换较新的浏览器可能改善兼容性。MP3 有损编码不提升音质。</p><h3>FLAC 文件想换成更方便携带的 MP3</h3><p>保留 FLAC 原件，再用本工具生成 MP3 作为日常播放副本。不要删除原件后指望从 MP3 完整还原无损音频，详见<a href="./mp3-quality.html">音质说明</a>。</p><h3>NCM/QMC 文件无法直接播放</h3><p>选择你有权处理的文件，看是否能恢复。成功后按实际后缀选择播放器；若输出 FLAC，它仍是 FLAC。提示需要额外密钥或暂不支持时，本工具不会要求你提交账号或获取密钥，详见<a href="./ncm-qmc.html">格式说明</a>。</p>
 <h2>处理失败时</h2><ul><li>检查大小和时长，尝试单个文件，关闭其他占用内存的页面。</li><li>使用新版浏览器；WMA、APE、AIFF、DFF 等格式可能无法解码。</li><li>特殊格式可能版本不兼容、需要额外密钥或已损坏，重命名后缀不能修复。</li><li>结果不能在某个播放器播放时，先核对真实后缀和播放器支持的编码。</li></ul><p>仍有问题？请按<a href="./contact.html">联系页面</a>提供错误提示与浏览器信息，无需发送歌曲内容。</p>`},
   {slug:'ncm-qmc', label:'NCM / QMC 是什么', title:'NCM、QMC 是什么？格式恢复与转 MP3 的区别', description:'了解 NCM、QMC 与 MP3、FLAC、OGG 的区别，为什么恢复后不一定是 MP3，以及额外密钥和不同客户端版本的支持限制。', body:`
@@ -40,19 +42,20 @@ export const contentPages = [
 ];
 
 const emailLink=link=>`<!--email_off-->${link}<!--/email_off-->`;
-export const contentNav = (english=false) => `<nav class="content-nav" aria-label="${english?'Help and policies':'说明与政策'}" data-i18n-aria="contentNav">${contentPages.map((p,i)=>`<a href="./${p.slug}.html" data-i18n="contentLink${i}">${english?['About (中文)','Contact (中文)','Privacy (中文)','How to use (中文)','NCM / QMC (中文)','MP3 quality (中文)'][i]:p.label}</a>`).join('')}</nav><p class="contact-email">${emailLink('<a href="mailto:fanghong1994@gmail.com">fanghong1994@gmail.com</a>')}</p>`;
+export const contentNav = (english=false,prefix='./') => `<nav class="content-nav" aria-label="${english?'Help and policies':'说明与政策'}" data-i18n-aria="contentNav">${contentPages.map((p,i)=>`<a href="${prefix}${english&&i<4?'en/':''}${p.slug}.html" data-content-slug="${p.slug}" data-i18n="contentLink${i}">${english?['About','Contact','Privacy','How to use','NCM / QMC (中文)','MP3 quality (中文)'][i]:p.label}</a>`).join('')}</nav><p class="contact-email">${emailLink('<a href="mailto:fanghong1994@gmail.com">fanghong1994@gmail.com</a>')}</p>`;
 
-export function renderContentPage(page, policy) {
+export function renderContentPage(page, policy,english=false) {
   const esc=s=>s.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');
-  const url=`https://zhuanmp3.com/${page.slug}.html`;
+  const prefix=english?'../':'./',home=prefix+(english?'en.html':''),url=`https://zhuanmp3.com/${english?'en/':''}${page.slug}.html`;
+  const alternates=englishPages.some(p=>p.slug===page.slug)?`<link rel="alternate" hreflang="zh-CN" href="https://zhuanmp3.com/${page.slug}.html"><link rel="alternate" hreflang="en" href="https://zhuanmp3.com/en/${page.slug}.html">`:'';
   const body=page.body.replace(/<a\b[^>]*href="mailto:fanghong1994@gmail.com"[^>]*>fanghong1994@gmail.com<\/a>/g,emailLink);
   return `<!doctype html>
-<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="${english?'en':'zh-CN'}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="${policy}"><meta name="referrer" content="no-referrer">
-<title>${esc(page.title)} - 转MP3</title><meta name="description" content="${esc(page.description)}"><link rel="canonical" href="${url}">
+<title>${esc(page.title)} - ${english?'ZhuanMP3':'转MP3'}</title><meta name="description" content="${esc(page.description)}"><link rel="canonical" href="${url}">${alternates}
 <meta property="og:type" content="article"><meta property="og:title" content="${esc(page.title)}"><meta property="og:description" content="${esc(page.description)}"><meta property="og:url" content="${url}">
-<link rel="icon" type="image/svg+xml" href="./favicon.svg"><link rel="stylesheet" href="./style.css?v=20261024-wechat"><link rel="stylesheet" href="./content.css?v=20261029">
-</head><body class="content-page"><header><div class="header-inner"><a class="brand" href="./"><img src="./favicon.svg" alt="" width="30" height="32">音频转换工具</a><a class="back-tool" href="./">返回转换工具 ↗</a></div></header>
-<main><article><p class="article-kicker">转MP3 · ${page.label}</p><h1>${page.title}</h1>${body}<aside class="article-end"><a href="./">打开音频转换工具 →</a><span>最后更新：2026-10-29</span></aside></article>
-<footer>${contentNav()}<p><a href="./">中文工具</a> · <a href="./en.html" lang="en">English tool</a> · <a href="./THIRD_PARTY_NOTICES.md">开源归属</a></p></footer></main></body></html>\n`;
+<link rel="icon" type="image/svg+xml" href="${prefix}favicon.svg"><link rel="stylesheet" href="${prefix}style.css?v=20261101"><link rel="stylesheet" href="${prefix}content.css?v=20261029">
+</head><body class="content-page"><header><div class="header-inner"><a class="brand" href="${home}"><img src="${prefix}favicon.svg" alt="" width="30" height="32">${english?'Audio Converter':'音频转换工具'}</a><a class="back-tool" href="${home}">${english?'Back to converter':'返回转换工具'} ↗</a></div></header>
+<main><article><p class="article-kicker">ZhuanMP3 · ${page.label}</p><h1>${page.title}</h1>${body}<aside class="article-end"><a href="${home}">${english?'Open audio converter':'打开音频转换工具'} →</a><span>${english?'Updated:':'最后更新：'} 2026-11-01</span></aside></article>
+<footer>${contentNav(english,prefix)}<p><a href="${prefix}">中文工具</a> · <a href="${prefix}en.html" lang="en">English tool</a> · <a href="${prefix}THIRD_PARTY_NOTICES.md">${english?'Open-source credits':'开源归属'}</a></p></footer></main></body></html>\n`;
 }

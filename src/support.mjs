@@ -1,4 +1,4 @@
-// Codex, 2026-10-22. Optional support after single-file or ZIP download; no payment API.
+// Optional support after a successful ZIP download; no payment API.
 import {t,onLanguageChange} from './i18n.mjs';
 export function setupSupportDialog() {
   const dialog = document.getElementById('support-dialog');
@@ -9,6 +9,9 @@ export function setupSupportDialog() {
   const label = document.getElementById('support-method');
   const alipay = document.getElementById('support-alipay');
   const wechat = document.getElementById('support-wechat');
+  const cards=document.getElementById('support-cards');
+  const coffee=document.getElementById('support-coffee');
+  function syncLanguage(){const en=document.documentElement.lang==='en';cards.hidden=en;coffee.hidden=!en;}
   function setMethod(method) {
     const useWechat = method === 'wechat';
     flip.dataset.method = method;
@@ -20,7 +23,8 @@ export function setupSupportDialog() {
   }
   toggle.addEventListener('click', () => setMethod(flip.dataset.method === 'wechat' ? 'alipay' : 'wechat'));
   setMethod('alipay');
-  onLanguageChange(()=>setMethod(flip.dataset.method));
+  syncLanguage();
+  onLanguageChange(()=>{setMethod(flip.dataset.method);syncLanguage();});
   document.getElementById('support-close').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => document.body.classList.remove('support-open'));
   return () => {

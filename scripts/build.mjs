@@ -3,7 +3,7 @@ import { build } from 'esbuild';
 import { mkdir, copyFile, writeFile, readFile, readdir } from 'node:fs/promises';
 import {staticText} from '../src/i18n.mjs';
 import {seo} from '../src/seo.mjs';
-import {contentPages,contentNav,renderContentPage} from '../src/content-pages.mjs';
+import {contentPages,englishPages,contentNav,renderContentPage} from '../src/content-pages.mjs';
 await mkdir('dist',{recursive:true});
 await mkdir('docs',{recursive:true});
 await build({entryPoints:{app:'src/app.mjs',worker:'src/worker.mjs'},outdir:'dist',bundle:true,format:'esm',platform:'browser',target:['es2020'],minify:true,legalComments:'linked',metafile:true,plugins:[{name:'replaceable-lgpl-encoder',setup(build){build.onResolve({filter:/^@breezystack\/lamejs$/},()=>({path:'./vendor/lamejs.js',external:true}));}}]}).then(r=>writeFile('docs/build-meta.json',JSON.stringify(r.metafile,null,2)));
@@ -25,8 +25,12 @@ for(const [lang,filename] of [['zh','index.html'],['en','en.html']]){
 }
 const policy=template.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)"/)[1];
 for(const page of contentPages)await writeFile(`dist/${page.slug}.html`,renderContentPage(page,policy));
+await mkdir('dist/en',{recursive:true});
+for(const page of englishPages)await writeFile(`dist/en/${page.slug}.html`,renderContentPage(page,policy,true));
 await mkdir('dist/assets/help',{recursive:true});
 for(const name of ['select.svg','queue.svg','download.svg'])await copyFile(`assets/help/${name}`,`dist/assets/help/${name}`);
+const diagramText={'选择本地音频文件的示意图':'Choose local audio files','拖入音频，或点击选择':'Drop audio or choose files','选择文件':'Choose files','处理队列和实际输出格式的示意图':'Processing queue and actual formats','处理队列':'Processing queue','录音.wav':'recording.wav','已转换 · MP3':'Converted · MP3','音乐.ncm':'music.ncm','已恢复 · FLAC':'Recovered · FLAC','单曲下载与打包下载的示意图':'Single and ZIP downloads','保存一个结果':'Save one result','保存多个结果':'Save multiple results','↓ 下载':'↓ Download','↓ 打包下载':'↓ Download ZIP','按实际音频格式保存':'Actual audio format','御用音乐包.zip':'Music Pack.zip'};
+for(const name of ['select','queue','download']){let svg=await readFile(`assets/help/${name}.svg`,'utf8');for(const [zh,en]of Object.entries(diagramText))svg=svg.replaceAll(zh,en);await writeFile(`dist/assets/help/${name}-en.svg`,svg);}
 await mkdir('dist/licenses',{recursive:true});
 for(const name of await readdir('licenses'))await copyFile(`licenses/${name}`,`dist/licenses/${name}`);
 await mkdir('dist/assets/support',{recursive:true});

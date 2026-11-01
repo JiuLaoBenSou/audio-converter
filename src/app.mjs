@@ -4,6 +4,7 @@ import { validateInput, SUPPORTED } from './engine.mjs';
 import { uniqueName, admit } from './batch.mjs';
 import { decodeAudio } from './decode-audio.mjs';
 import { setupSupportDialog } from './support.mjs';
+import {inputExpectation,errorCategory} from './task-copy.mjs';
 import {setupLanguage,t,translateMessage,onLanguageChange} from './i18n.mjs';
 const $=id=>document.getElementById(id);
 setupLanguage();
@@ -24,11 +25,12 @@ function refresh(){
 function renderItem(item){
   const row=el('li');row.className=item.state;row.dataset.state=item.state;
   const main=el('div');main.append(el('div','file-name',item.name),el('div','file-detail',`${bytes(item.size)}${item.outputName?` → ${item.outputName} · ${bytes(item.blob.size)}`:''}`));
-  const state=el('div','file-state',translateMessage(item.message));main.append(state);
+  main.append(el('div','file-detail',item.state==='done'?t('detectedOutput',{ext:item.outputExt.toUpperCase()}):inputExpectation(item.name,document.documentElement.lang)));
+  const state=el('div','file-state',`${item.state==='failed'?errorCategory(item.message,document.documentElement.lang)+' · ':''}${translateMessage(item.message)}`);main.append(state);
   if(item.state==='processing'){const progress=el('progress','file-progress');progress.max=100;progress.value=item.progress||0;progress.setAttribute('aria-label',t('progress',{name:item.name}));main.append(progress);}
   if(item.warnings?.length)main.append(el('div','file-detail',item.warnings.map(translateMessage).join(' ')));
   const actions=el('div','file-buttons');
-  if(item.state==='done'){const a=el('a','',t('download'));a.href=item.url;a.download=item.outputName;a.setAttribute('aria-label',t('downloadLabel',{name:item.outputName}));a.addEventListener('click',()=>setTimeout(showSupport,0));actions.append(a);}
+  if(item.state==='done'){const a=el('a','',t('download'));a.href=item.url;a.download=item.outputName;a.setAttribute('aria-label',t('downloadLabel',{name:item.outputName}));actions.append(a);}
   if(item.state==='processing'||item.state==='queued'){const cancel=el('button','',t('cancel'));cancel.addEventListener('click',()=>{item.state='failed';item.message='已取消。';item.file=null;if(item.cancel)item.cancel();renderItem(item);refresh();});actions.append(cancel);}
   row.append(main,actions);
   if(item.state==='done'){const audio=el('audio','file-preview');audio.controls=true;audio.preload='none';audio.src=item.url;audio.setAttribute('aria-label',t('preview',{name:item.outputName}));row.append(audio);}
@@ -57,7 +59,7 @@ async function pump(){
       const total=items.reduce((n,i)=>n+(i.blob?.size||0),0);
       if(total+blob.size>270*1024**2)throw Error('结果总量超过 270 MB，请下载并清空后分批处理。');
       const used=new Set(items.filter(i=>i.outputName).map(i=>i.outputName.toLowerCase()));
-      item.outputName=uniqueName(result.name,used);item.blob=blob;item.url=URL.createObjectURL(blob);item.state='done';item.message=`${result.action==='transcoded'?'已转换':result.action==='original'?'已是 MP3':'已恢复'} · ${result.ext.toUpperCase()}`;item.warnings=result.warnings;
+      item.outputName=uniqueName(result.name,used);item.outputExt=result.ext;item.blob=blob;item.url=URL.createObjectURL(blob);item.state='done';item.message=`${result.action==='transcoded'?'已转换':result.action==='original'?'已是 MP3':'已恢复'} · ${result.ext.toUpperCase()}`;item.warnings=result.warnings;
     }catch(e){if(current!==generation)break;item.state='failed';item.message=e.message;}
     item.file=null;renderItem(item);refresh();
   }
