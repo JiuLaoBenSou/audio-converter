@@ -4,7 +4,9 @@ import { validateInput, SUPPORTED } from './engine.mjs';
 import { uniqueName, admit } from './batch.mjs';
 import { decodeAudio } from './decode-audio.mjs';
 import { setupSupportDialog } from './support.mjs';
-import {inputExpectation,errorCategory} from './task-copy.mjs';
+import {inputExpectation,errorCategory,inputGroup,failureOutcome} from './task-copy.mjs';
+import {createMetricsReporter} from './metrics-client.mjs';
+import {metricsEndpoint} from './metrics-config.mjs';
 import {setupLanguage,t,translateMessage,onLanguageChange} from './i18n.mjs';
 const $=id=>document.getElementById(id);
 setupLanguage();
@@ -14,6 +16,8 @@ let items=[],running=false,generation=0,activeWorker=null,zipBusy=false,zipUrl=n
 const bytes=n=>n<1024**2?`${(n/1024).toFixed(1)} KB`:`${(n/1024**2).toFixed(1)} MB`;
 function notice(message){lastNotice=message;$('notice').textContent=translateMessage(message);$('notice').hidden=!message;}
 function el(tag,className,text){const n=document.createElement(tag);if(className)n.className=className;if(text!==undefined)n.textContent=text;return n;}
+function metric(event,group,outcome){const mode=new URLSearchParams(location.search).get('metrics');createMetricsReporter({endpoint:metricsEndpoint,hostname:location.hostname,lang:document.documentElement.lang,environment:mode==='test'||location.hostname!=='zhuanmp3.com'?'test':'production',disabled:mode==='off',doNotTrack:navigator.doNotTrack,globalPrivacyControl:navigator.globalPrivacyControl}).emit(event,group,outcome);}
+function recordOutcome(item,outcome){if(item.counted)return;item.counted=true;metric('process_finished',inputGroup(item.name),outcome);}
 function refresh(){
   $('empty').hidden=items.length>0;$('count').textContent=t('fileCount',{count:items.length});
   const done=items.filter(x=>x.state==='done').length,failed=items.filter(x=>x.state==='failed').length;
@@ -30,8 +34,8 @@ function renderItem(item){
   if(item.state==='processing'){const progress=el('progress','file-progress');progress.max=100;progress.value=item.progress||0;progress.setAttribute('aria-label',t('progress',{name:item.name}));main.append(progress);}
   if(item.warnings?.length)main.append(el('div','file-detail',item.warnings.map(translateMessage).join(' ')));
   const actions=el('div','file-buttons');
-  if(item.state==='done'){const a=el('a','',t('download'));a.href=item.url;a.download=item.outputName;a.setAttribute('aria-label',t('downloadLabel',{name:item.outputName}));actions.append(a);}
-  if(item.state==='processing'||item.state==='queued'){const cancel=el('button','',t('cancel'));cancel.addEventListener('click',()=>{item.state='failed';item.message='已取消。';item.file=null;if(item.cancel)item.cancel();renderItem(item);refresh();});actions.append(cancel);}
+  if(item.state==='done'){const a=el('a','',t('download'));a.href=item.url;a.download=item.outputName;a.setAttribute('aria-label',t('downloadLabel',{name:item.outputName}));a.addEventListener('click',()=>metric('download_triggered','none','single'));actions.append(a);}
+  if(item.state==='processing'||item.state==='queued'){const cancel=el('button','',t('cancel'));cancel.addEventListener('click',()=>{item.state='failed';item.message='已取消。';item.file=null;recordOutcome(item,'cancel');if(item.cancel)item.cancel();renderItem(item);refresh();});actions.append(cancel);}
   row.append(main,actions);
   if(item.state==='done'){const audio=el('audio','file-preview');audio.controls=true;audio.preload='none';audio.src=item.url;audio.setAttribute('aria-label',t('preview',{name:item.outputName}));row.append(audio);}
   if(item.row)item.row.replaceWith(row);else $('list').append(row);item.row=row;
@@ -60,7 +64,8 @@ async function pump(){
       if(total+blob.size>270*1024**2)throw Error('结果总量超过 270 MB，请下载并清空后分批处理。');
       const used=new Set(items.filter(i=>i.outputName).map(i=>i.outputName.toLowerCase()));
       item.outputName=uniqueName(result.name,used);item.outputExt=result.ext;item.blob=blob;item.url=URL.createObjectURL(blob);item.state='done';item.message=`${result.action==='transcoded'?'已转换':result.action==='original'?'已是 MP3':'已恢复'} · ${result.ext.toUpperCase()}`;item.warnings=result.warnings;
-    }catch(e){if(current!==generation)break;item.state='failed';item.message=e.message;}
+      recordOutcome(item,'success');
+    }catch(e){if(current!==generation)break;item.state='failed';item.message=e.message;recordOutcome(item,failureOutcome(e.message));}
     item.file=null;renderItem(item);refresh();
   }
   running=false;refresh();if(items.some(i=>i.state==='queued'))pump();
@@ -72,7 +77,7 @@ function addFiles(files){
   for(const file of files){
     let error;try{validateInput(file);}catch(e){error=e.message;}
     const limit=admit(items,file);if(limit){messages.push(limit);break;}
-    const item={file:error?null:file,size:file.size,name:file.name,state:error?'failed':'queued',message:error||'等待本地处理'};items.push(item);renderItem(item);
+    const item={file:error?null:file,size:file.size,name:file.name,state:error?'failed':'queued',message:error||'等待本地处理'};items.push(item);if(error)recordOutcome(item,failureOutcome(error));renderItem(item);
   }
   notice(messages.join(' '));refresh();pump();
 }
@@ -84,7 +89,7 @@ zone.addEventListener('dragenter',e=>{e.preventDefault();dragDepth++;zone.classL
 zone.addEventListener('dragover',e=>e.preventDefault());
 zone.addEventListener('dragleave',()=>{if(--dragDepth<=0){dragDepth=0;zone.classList.remove('dragging');}});
 zone.addEventListener('drop',e=>{e.preventDefault();dragDepth=0;zone.classList.remove('dragging');addFiles(e.dataTransfer.files);});
-$('clear').addEventListener('click',()=>{generation++;for(const i of items){i.cancel?.();if(i.url)URL.revokeObjectURL(i.url);}activeWorker?.terminate();items=[];$('list').replaceChildren();notice('');if(zipUrl){URL.revokeObjectURL(zipUrl);zipUrl=null;}refresh();});
+$('clear').addEventListener('click',()=>{generation++;for(const i of items){if(['queued','processing'].includes(i.state))recordOutcome(i,'cancel');i.cancel?.();if(i.url)URL.revokeObjectURL(i.url);}activeWorker?.terminate();items=[];$('list').replaceChildren();notice('');if(zipUrl){URL.revokeObjectURL(zipUrl);zipUrl=null;}refresh();});
 $('zip').addEventListener('click',async()=>{
   const done=items.filter(i=>i.state==='done');
   if(done.reduce((n,i)=>n+i.blob.size,0)>150*1024**2){notice('打包总量超过 150 MB，请逐个下载，或清空后分批处理。');return;}
@@ -95,7 +100,8 @@ $('zip').addEventListener('click',async()=>{
     if(zipUrl)URL.revokeObjectURL(zipUrl);zipUrl=URL.createObjectURL(result);
     const a=el('a');a.href=zipUrl;a.download=t('zipName');document.body.append(a);a.click();a.remove();notice(`已生成 ${done.length} 个文件的 ZIP；下载由浏览器保存。`);
     downloaded=true;
-  }catch{notice('打包失败，可能内存不足。已转换的文件仍可逐个下载。');}
+    metric('download_triggered','none','zip');
+  }catch{metric('zip_failed','none','error');notice('打包失败，可能内存不足。已转换的文件仍可逐个下载。');}
   finally{zipBusy=false;refresh();}
   if(downloaded)showSupport();
 });

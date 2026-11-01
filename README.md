@@ -44,3 +44,10 @@ npm run dev
 详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 和 [licenses/](licenses/)。MP3 编码使用 LAME；库作为独立可替换 ES 模块提供，对应源码包和 LGPL/GPL 文本随站点发布。算法参考和固定提交均在归属文件中列明。
 
 维护：2026-10-21，Codex 按项目用户授权准备首个公开版本。
+
+
+## 最少业务计数
+
+处理结果、下载触发与ZIP失败通过本站 /api/metrics 汇总到Cloudflare D1，只保存固定类别和UTC日计数，不存音频、文件名、路径或访客标识。下载触发不代表保存成功，不统计打赏到账。Do Not Track、GPC或工具地址的metrics=off会关闭这些请求。测试使用metrics=test隔离；隐私与90个UTC日期保留边界见网站隐私政策。开发与管理员读取方式见services/metrics/README.md。
+
+完整测试含node:sqlite；本次使用Node 24.22.1。独立计数服务按services/metrics/package.json内CLI版本要求运行，不需要改主站托管。

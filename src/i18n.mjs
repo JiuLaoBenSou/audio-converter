@@ -10,8 +10,8 @@ const copy={
   contentLink1:['联系','Contact'],
   contentLink2:['隐私政策','Privacy'],
   contentLink3:['使用说明','How to use'],
-  contentLink4:['NCM / QMC 是什么','NCM / QMC (中文)'],
-  contentLink5:['MP3 与音质','MP3 quality (中文)'],
+  contentLink4:['NCM / QMC 是什么','NCM / QMC explained'],
+  contentLink5:['MP3 与音质','MP3 quality'],
   stepsTitle:['如何转换音频','How to convert audio'],
   steps:['选择或拖入文件，等待队列处理完成，再单独下载或打包下载。无需注册，原文件不会被修改。','Choose or drop your files, wait for processing to finish, then download individual results or a ZIP. No sign-up is required and original files are not modified.'],
   faqTitle:['常见问题','Common questions'],
@@ -161,7 +161,7 @@ function applyLanguage(){
   document.querySelectorAll('[data-i18n]').forEach(node=>{node.textContent=t(node.dataset.i18n);});
   document.querySelectorAll('[data-i18n-aria]').forEach(node=>node.setAttribute('aria-label',t(node.dataset.i18nAria)));
   document.querySelectorAll('[data-i18n-alt]').forEach(node=>node.setAttribute('alt',t(node.dataset.i18nAlt)));
-  document.querySelectorAll('[data-content-slug]').forEach(node=>{const slug=node.dataset.contentSlug;node.setAttribute('href',language==='en'&&['about','contact','privacy','how-to-use'].includes(slug)?`./en/${slug}.html`:`./${slug}.html`);});
+  document.querySelectorAll('[data-content-slug]').forEach(node=>{const slug=node.dataset.contentSlug;node.setAttribute('href',language==='en'?`./en/${slug}.html`:`./${slug}.html`);});
   const selector=document.getElementById('language');if(selector)selector.value=language;
 }
 export function setupLanguage(){

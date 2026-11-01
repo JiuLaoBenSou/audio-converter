@@ -10,3 +10,5 @@ export function errorCategory(message,lang='zh') {
   const categories=[[/取消/,['已取消','Cancelled']],[/超过|超时|限制|以内|过大|过多|内存/,['处理限制','Limit or resource issue']],[/浏览器|线程异常|处理线程/,['浏览器支持','Browser support issue']],[/暂不支持|不支持此扩展名|不能恢复|暂不能转换/,['暂不支持','Unsupported format or version']],[/损坏|截断|无效|为空|未识别|越界|密钥|编码/,['文件无效或版本不兼容','Invalid or unsupported file']]];
   return (categories.find(([pattern])=>pattern.test(message))?.[1]||['处理失败','Processing failed'])[lang==='en'?1:0];
 }
+export function inputGroup(name){const ext=name.split('.').at(-1).toLowerCase();return ext==='mp3'?'existing_mp3':ORDINARY.includes(ext)?'ordinary':['ncm',...QMC,...EXTRA].includes(ext)?'special':'unknown';}
+export function failureOutcome(message){return ({'Cancelled':'cancel','Limit or resource issue':'limit','Browser support issue':'browser_decode','Unsupported format or version':'unsupported','Invalid or unsupported file':'invalid_or_unknown'})[errorCategory(message,'en')]||'other';}
