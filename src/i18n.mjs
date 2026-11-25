@@ -168,7 +168,13 @@ export function setupLanguage(){
   const selector=document.getElementById('language');
   let saved;try{saved=localStorage.getItem('audio-converter-language');}catch{}
   const query=new URL(location.href).searchParams.get('lang');
-  language=['en','zh'].includes(query)?query:location.pathname.endsWith('/en.html')?'en':saved==='en'?'en':'zh';
+  const pathname=location.pathname;
+  const isChineseLanding=pathname==='/'||pathname==='/index.html';
+  const isEnglishLanding=pathname.endsWith('/en.html');
+  if(query==='en'||query==='zh')language=query;
+  else if(isEnglishLanding)language='en';
+  else if(isChineseLanding)language='zh';
+  else language=saved==='en'?'en':'zh';
   function syncUrl(){try{const url=new URL(location.href);url.pathname=new URL(language==='en'?'en.html':'./',url).pathname;url.searchParams.delete('lang');history.replaceState(null,'',url);}catch{}}
   syncUrl();
   try{localStorage.setItem('audio-converter-language',language);}catch{}
